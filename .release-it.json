@@ -25,6 +25,7 @@
   },
   "git": {
     "commitMessage": "chore: Release v${version}",
+    "pushRepo": "git@github.com:1zsleep/AssetManagementSystem.git",
     "push": true
   },
   "github": {
