@@ -41,7 +41,7 @@ export const httpRequest = async (url: string, options : UseFetchOptions<any> ):
         onRequest({ request, options }) {
             // Set the request headers
             // note that this relies on ofetch >= 1.4.0 - you may need to refresh your lockfile
-            options.headers.set('Authorization', 'Bearer '+useStore().getToken)
+            options.headers.set('Authorization', 'Bearer '+userStore().getToken)
         },
         //当请求失败（例如网络错误、超时等）时触发。
         onRequestError({ request, options, error }) {
@@ -51,7 +51,6 @@ export const httpRequest = async (url: string, options : UseFetchOptions<any> ):
         onResponse({ request, response, options }) {
             console.log(response);
             // Process the response data
-            useStore().setToken(response._data.token);
         },
         //当响应失败（如 4xx、5xx 错误等）时触发。
         onResponseError({ request, response, options }) {

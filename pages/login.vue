@@ -29,30 +29,16 @@
 </template>
 
 <script setup>
-
+definePageMeta({
+  //layout不展示
+  layout: false
+}
+);
 const username = ref('');
 const password = ref('');
 
 const handleLogin = () => {
-  // 处理登录逻辑
-  console.log('用户名:', username.value);
-  console.log('密码:', password.value);
-  httpPost('/auth/login',{
-    userName: username.value,
-    userPassword: password.value
-  }).then(
-      (res) => {
-        console.log(res);
-        if(res.status._rawValue === 'success'){
-          useStore().setToken(res.data._rawValue);
-          navigateTo('/');
-          ElMessage.success('登录成功');
-        }else {
-          ElMessage.error('账号或密码错误');
-        }
-      }
-  )
-
+  userStore().login(username.value, password.value)
 };
 </script>
 
