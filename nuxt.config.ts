@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     $development: undefined, $env: undefined, $meta: undefined, $production: undefined, $test: undefined,
+    components: true,
     compatibilityDate: '2024-11-01',
     devtools: {enabled: true},
     modules: [
@@ -11,6 +12,7 @@ export default defineNuxtConfig({
         '@element-plus/nuxt',
         '@pinia/nuxt',
         'pinia-plugin-persistedstate/nuxt',
+        'dayjs-nuxt',
     ],
     build: {
         transpile: ['@tsparticles/vue3'],
@@ -30,5 +32,10 @@ export default defineNuxtConfig({
     },
     pinia: {
         storesDirs: ['./stores/**', './custom-folder/stores/**'],
+    },
+    ssr: false,
+    dayjs: {
+        locales: ['zh-cn'],
+        defaultLocale: 'zh-cn'
     }
 })

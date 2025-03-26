@@ -2,52 +2,104 @@
 <template>
   <!-- 标题 区域 -->
   <div class="logo-area">
-    <!-- 根据折叠状态显示/隐藏文字 -->
     <span class="logo-text" :style="{ opacity: isCollapsed ? 0 : 1 }">资源门户</span>
   </div>
 
   <el-menu
+      :default-active="activeIndex"
+      :default-openeds="openedMenus"
       :collapse="isCollapsed"
       :collapse-transition="true"
-      default-active="1"
       background-color="#002140"
       active-text-color="#1890FF"
+      router
   >
-    <el-sub-menu index="1" :popper-offset="21">
-      <template #title class="">
-        <el-icon><Message /></el-icon>
-        <span>导航一</span>
-      </template>
-      <el-menu-item-group >
-        <el-menu-item index="1-1">选项1</el-menu-item>
-        <el-menu-item index="1-2">选项2</el-menu-item>
-      </el-menu-item-group>
-    </el-sub-menu>
+    <template v-for="menu in store.filteredMenus" :key="menu.index">
+      <el-sub-menu
+          :index="menu.index"
+          :popper-offset="21"
+          :popper-class="menu.popperClass"
+      >
+        <template #title>
+          <el-icon>
+            <component :is="menu.icon" />
+          </el-icon>
+          <span>{{ menu.title }}</span>
+        </template>
 
-    <el-sub-menu index="2"  popper-class="pop" >
-      <template #title>
-        <el-icon><Delete /></el-icon>
-        <span>导航二</span>
-      </template>
-      <el-menu-item-group>
-        <el-menu-item index="2-1">选项1</el-menu-item>
-        <el-menu-item index="2-2">选项2</el-menu-item>
-      </el-menu-item-group>
-    </el-sub-menu>
+        <el-menu-item-group>
+          <el-menu-item
+              v-for="item in menu.children"
+              :key="item.index"
+              :index="item.index"
+              :route="item.path"
+          >
+            {{ item.title }}
+          </el-menu-item>
+        </el-menu-item-group>
+      </el-sub-menu>
+    </template>
   </el-menu>
-
 </template>
 
 <script setup lang="ts">
+import { useRoute } from '#app'
+import { menuStore } from '~/composables/menuStore'
 
-import {Delete, Message} from "@element-plus/icons-vue";
 
-defineProps({
+const props = defineProps({
   isCollapsed: {
     type: Boolean,
     default: false
   }
 })
+
+const route = useRoute()
+const store = menuStore()
+
+// 路径匹配工具函数
+const findActiveMenuIndex = (currentPath: string): string => {
+  // 精确匹配子菜单项
+  const exactMatch = store.allMenus
+      .flatMap(menu => menu.children || [])
+      .find(child => child.path === currentPath)
+
+  if (exactMatch) return exactMatch.index
+
+  // 嵌套路径匹配
+  const pathSegments = currentPath.split('/').filter(Boolean)
+  let bestMatch = { depth: 0, index: '' }
+
+  store.allMenus.forEach(menu => {
+    const menuSegments = menu.path.split('/').filter(Boolean)
+    const matchDepth = menuSegments.reduce((depth, seg, i) =>
+        seg === pathSegments[i] ? depth + 1 : depth, 0
+    )
+
+    if (matchDepth > bestMatch.depth) {
+      bestMatch = { depth: matchDepth, index: menu.index }
+    }
+  })
+
+  // 使用路由元数据作为备用方案
+  return bestMatch.index || (route.meta.menuIndex as string) || ''
+}
+
+// 计算激活菜单项
+const activeIndex = computed(() => findActiveMenuIndex(route.path))
+
+// 计算需要展开的父菜单
+const openedMenus = computed(() => {
+  return store.allMenus
+      .filter(menu =>
+          menu.children?.some(child =>
+              route.path.startsWith(child.path) ||
+              route.path === child.path
+          )
+      )
+      .map(menu => menu.index)
+})
+
 </script>
 
 <style lang="scss" scoped>

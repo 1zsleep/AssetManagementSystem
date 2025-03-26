@@ -1,21 +1,31 @@
-<!-- 错误页. 不管是 404 还是 500 还是其他错误都会自动到这个页面来 -->
-<template>
-  <div>
-    <!--  服务端跳转这里可以根据 "statusCode": 404 来判断是404还是500 来进行展示  -->
-    <!--  客户端错误过来的，是没有code的, 数据直接就是 Error: xxx错误信息，需要根据自定义的错误内容来判断  -->
-    <h2> 错误页 </h2>
-    <pre>
-            { { error } }
-       </pre>
-  </div>
-
-</template>
-
+<!-- error.vue -->
 <script setup lang="ts">
-defineProps({
-  error: Object
+import type { NuxtError } from '#app'
+
+const errorRef = useError()
+const error = computed(() => errorRef.value as NuxtError<{
+  statusCode?: number
+  message?: string
+}>)
+
+const errorMessage = computed(() => {
+  if (error.value.statusCode === 403) {
+    return '账户已被禁用，请联系管理员'
+  }
+  return error.value.message || '未知错误'
 })
+
+const statusCode = computed(() => error.value.statusCode || 500)
 </script>
 
-<style scoped>
-</style>
+<template>
+  <NuxtLayout>
+    <div class="error-page">
+      <h1 v-if="statusCode">{{ statusCode }}</h1>
+      <p>{{ errorMessage }}</p>
+      <ElButton @click="clearError({ redirect: '/' })">
+        返回首页
+      </ElButton>
+    </div>
+  </NuxtLayout>
+</template>

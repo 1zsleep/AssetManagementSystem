@@ -36,7 +36,6 @@ definePageMeta({
 );
 const username = ref('');
 const password = ref('');
-
 const handleLogin = () => {
   userStore().login(username.value, password.value)
 };

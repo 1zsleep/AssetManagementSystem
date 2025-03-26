@@ -1,4 +1,5 @@
 import {defineStore} from "pinia";
+import {jwtDecode} from "jwt-decode";
 
 export const userStore = defineStore('storeId', {
     state: () => ({
@@ -11,10 +12,10 @@ export const userStore = defineStore('storeId', {
                 userPassword: password
             }).then(
                 (res) => {
-                    console.log(res);
                     if(res.status._rawValue === 'success'){
                         console.log(res.data._rawValue.data)
                         this.token=(res.data._rawValue.data);
+                        console.log(jwtDecode(this.token))
                         ElMessage.success('登录成功');
                         navigateTo('/');
                     }else {

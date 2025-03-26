@@ -18,7 +18,7 @@
       <div class="user">
         <el-dropdown placement="bottom">
         <span class="el-dropdown-link">
-          {{ jwtDecode(userStore().getToken).sub }}<el-icon> <arrow-down/> </el-icon>
+          {{ username }}<el-icon> <arrow-down/> </el-icon>
         </span>
           <template #dropdown>
             <el-dropdown-menu style="list-style: none;margin-left:-33px;outline: unset;" >
@@ -36,15 +36,26 @@
 <script setup>
 // 引入Vue和Element Plus相关组件
 import {ElDropdown, ElDropdownItem, ElDropdownMenu, ElHeader} from 'element-plus';
-import {ArrowDown, Expand, Fold, SwitchButton} from "@element-plus/icons-vue";
 import {jwtDecode} from 'jwt-decode';
-
+import {SwitchButton, Expand, Fold} from "@element-plus/icons-vue";
 defineProps(['isCollapsed'])
 defineEmits(['toggle-collapse'])
 const loginOut=()=>{
   userStore().deleteToken();
   navigateTo("/login");
 }
+
+const username = ref("");
+onMounted(() => {
+  try {
+    const token = userStore().getToken;
+    if (token) {
+      username.value = jwtDecode(token).sub; // 解析 token
+    }
+  } catch (error) {
+    console.error("JWT 解码失败", error);
+  }
+});
 </script>
 
 <style scoped>
@@ -52,6 +63,8 @@ const loginOut=()=>{
 .header {
   background-color: #ffffff;
   margin-left: -15px;
+  min-width: 100%; /* 顶部栏最小宽度 */
+  flex-shrink: 0; /* 禁止收缩 */
 }
 
 /* 设置顶部内容布局 */
