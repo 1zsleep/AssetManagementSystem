@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Plus, Refresh, Search, Close } from "@element-plus/icons-vue";
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useDebounceFn } from '@vueuse/core'
+import {Close, Plus, Refresh, Search} from "@element-plus/icons-vue";
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {useDebounceFn} from '@vueuse/core'
 import dayjs from 'dayjs'
 import {jwtDecode} from "jwt-decode";
 
 // 类型定义------------------------------------------------
-import type {UserGroup, GroupMember, UserOption, JwtPayload, User} from '~/types'
+import type {GroupMember, JwtPayload, User, UserGroup, UserOption} from '~/types'
 
 
 // 响应式状态----------------------------------------------
@@ -23,7 +23,7 @@ const form = reactive({
 })
 const userOptions = ref<UserOption[]>([])
 const currentGroupId = ref<number>()
-const members = ref<Array<{groupId: number, userId: number, userName: string}>>([])
+const members = ref<Array<{ groupId: number, userId: number, userName: string }>>([])
 const editForm = reactive({
   originalGroupName: '',
   groupName: '',
@@ -141,14 +141,15 @@ const deleteGroup = (groupId: number) => {
   }).then(async () => {
     try {
       await http.$delete(`/groups/${groupId}`, {
-        params: { operatorId: (await getCurrentUserInfo()).id }
+        params: {operatorId: (await getCurrentUserInfo()).id}
       })
       ElMessage.success('删除成功')
       await getGroupList()
     } catch (error) {
       handleError(error, '删除失败')
     }
-  }).catch(() => {})
+  }).catch(() => {
+  })
 }
 
 const openEditDialog = async (groupId: number) => {
@@ -264,14 +265,14 @@ const debouncedSearch = useDebounceFn(getGroupList, 500)
                 @clear="getGroupList"
             >
               <template #append>
-                <el-button :icon="Search" @click="getGroupList" />
+                <el-button :icon="Search" @click="getGroupList"/>
               </template>
             </el-input>
           </el-col>
 
           <el-col :xs="24" :sm="4" :md="2">
             <el-tooltip content="刷新">
-              <el-button :icon="Refresh" circle @click="getGroupList" />
+              <el-button :icon="Refresh" circle @click="getGroupList"/>
             </el-tooltip>
           </el-col>
         </el-row>
@@ -288,7 +289,7 @@ const debouncedSearch = useDebounceFn(getGroupList, 500)
             backgroundColor: '#f8f9fa'
           }"
         >
-          <el-table-column prop="id" label="ID" align="center" width="80" />
+          <el-table-column prop="id" label="ID" align="center" width="80"/>
           <el-table-column
               prop="groupName"
               label="组名称"
@@ -424,7 +425,7 @@ const debouncedSearch = useDebounceFn(getGroupList, 500)
                       class="remove-icon"
                       @click="editForm.selectedUserIds = editForm.selectedUserIds.filter((_,i) => i !== index)"
                   >
-                    <Close />
+                    <Close/>
                   </el-icon>
                 </el-tooltip>
               </span>
@@ -460,7 +461,7 @@ const debouncedSearch = useDebounceFn(getGroupList, 500)
 .card-container {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   padding: 20px;
 }
 
@@ -576,7 +577,7 @@ const debouncedSearch = useDebounceFn(getGroupList, 500)
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;

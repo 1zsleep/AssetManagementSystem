@@ -5,22 +5,22 @@
       <div class="login-header">请登录</div>
       <div class="form-content">
         <form @submit.prevent="handleLogin">
-        <el-input
-            v-model="username"
-            placeholder="账号"
-            class="input-field"
-            clearable
-        />
-        <el-input
-            v-model="password"
-            type="password"
-            placeholder="密码"
-            class="input-field"
-            clearable
-            show-password
-            @keyup.enter="handleLogin"
-        />
-        <el-button type="primary" class="login-button" @click="handleLogin">登录</el-button>
+          <el-input
+              v-model="username"
+              placeholder="账号"
+              class="input-field"
+              clearable
+          />
+          <el-input
+              v-model="password"
+              type="password"
+              placeholder="密码"
+              class="input-field"
+              clearable
+              show-password
+              @keyup.enter="handleLogin"
+          />
+          <el-button type="primary" class="login-button" @click="handleLogin">登录</el-button>
         </form>
       </div>
     </el-card>
@@ -30,9 +30,9 @@
 
 <script setup>
 definePageMeta({
-  //layout不展示
-  layout: false
-}
+      //layout不展示
+      layout: false
+    }
 );
 const username = ref('');
 const password = ref('');

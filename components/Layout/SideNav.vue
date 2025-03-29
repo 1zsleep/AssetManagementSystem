@@ -22,7 +22,7 @@
       >
         <template #title>
           <el-icon>
-            <component :is="menu.icon" />
+            <component :is="menu.icon"/>
           </el-icon>
           <span>{{ menu.title }}</span>
         </template>
@@ -43,8 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from '#app'
-import { menuStore } from '~/composables/menuStore'
+import {useRoute} from '#app'
+import {menuStore} from '~/composables/menuStore'
 
 
 const props = defineProps({
@@ -68,7 +68,7 @@ const findActiveMenuIndex = (currentPath: string): string => {
 
   // 嵌套路径匹配
   const pathSegments = currentPath.split('/').filter(Boolean)
-  let bestMatch = { depth: 0, index: '' }
+  let bestMatch = {depth: 0, index: ''}
 
   store.allMenus.forEach(menu => {
     const menuSegments = menu.path.split('/').filter(Boolean)
@@ -77,7 +77,7 @@ const findActiveMenuIndex = (currentPath: string): string => {
     )
 
     if (matchDepth > bestMatch.depth) {
-      bestMatch = { depth: matchDepth, index: menu.index }
+      bestMatch = {depth: matchDepth, index: menu.index}
     }
   })
 
@@ -103,13 +103,14 @@ const openedMenus = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-.pop{
+.pop {
 
-  .el-menu--popup{
+  .el-menu--popup {
     margin-left: 200px !important;
     background-color: red;
   }
 }
+
 .logo-area {
   height: 60px;
   display: flex;
@@ -118,6 +119,7 @@ const openedMenus = computed(() => {
   cursor: pointer;
   background: #002140;
   transition: all 0.3s;
+
   .logo-text {
     color: #fff;
     font-size: 20px;
@@ -138,10 +140,12 @@ const openedMenus = computed(() => {
 
     &__title {
       color: #999 !important;
+
       &:hover {
         color: #fff !important;
         background-color: #002140;
       }
+
       .el-icon {
         color: inherit;
       }

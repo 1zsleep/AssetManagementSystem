@@ -1,7 +1,7 @@
 // composables/useMenu.ts
-import { defineStore } from "pinia";
-import { jwtDecode } from "jwt-decode";
-import { userStore } from "./userStore";
+import {defineStore} from "pinia";
+import {jwtDecode} from "jwt-decode";
+import {userStore} from "./userStore";
 
 export interface MenuItem {
     index: string;
@@ -23,6 +23,7 @@ export interface SubMenuItem {
 export interface JwtPayload {
     id: any;
     roles?: string[];
+
     [key: string]: any;
 }
 
@@ -53,10 +54,30 @@ export const menuStore = defineStore('menuStore', {
             },
             {
                 index: '2',
-                path: '/assetManagement',
-                title: '资源管理',
-                icon: 'List',
+                path: '/fileManagement',
+                title: '文件管理',
+                icon: 'Files',
                 requiredRoles: ['管理员'],
+                children: [
+                    {
+                        index: '2-1',
+                        title: '我的资源',
+                        path: '/fileManagement/private',
+                        exact: true
+                    },
+                    {
+                        index: '2-2',
+                        title: '群组资源',
+                        path: '/fileManagement/group',
+                        exact: true
+                    },
+                    {
+                        index: '2-3',
+                        title: '公共资源',
+                        path: '/fileManagement/public',
+                        exact: true
+                    }
+                ]
             }
         ] as MenuItem[]
     }),

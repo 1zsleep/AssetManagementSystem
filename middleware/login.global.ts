@@ -1,16 +1,16 @@
 import {jwtDecode} from "jwt-decode";
 
-export default defineNuxtRouteMiddleware((to,from) => {
+export default defineNuxtRouteMiddleware((to, from) => {
     const exclude = ['/login'];
-    if (exclude.includes(to.path)){
+    if (exclude.includes(to.path)) {
         return;
     }
-    if (import.meta.client){
+    if (import.meta.client) {
         const store = userStore();
         const token = store.getToken;
         if (!token) {
             ElMessage.warning('请先登录');
-            return navigateTo({ path: '/login' });
+            return navigateTo({path: '/login'});
         }
         try {
             // 解码并验证token

@@ -6,19 +6,19 @@ export const userStore = defineStore('storeId', {
         token: '',
     }),
     actions: {
-        login(username: string, password: string){
-            httpPost('/auth/login',{
+        login(username: string, password: string) {
+            httpPost('/auth/login', {
                 userName: username,
                 userPassword: password
             }).then(
                 (res) => {
-                    if(res.status._rawValue === 'success'){
+                    if (res.status._rawValue === 'success') {
                         console.log(res.data._rawValue.data)
-                        this.token=(res.data._rawValue.data);
+                        this.token = (res.data._rawValue.data);
                         console.log(jwtDecode(this.token))
                         ElMessage.success('登录成功');
                         navigateTo('/');
-                    }else {
+                    } else {
                         ElMessage.error('账号或密码错误')
                     }
                 }
@@ -38,7 +38,7 @@ export const userStore = defineStore('storeId', {
             return state.token
         },
     },
-    persist :{
-        storage : import.meta.client ? piniaPluginPersistedstate.localStorage() : piniaPluginPersistedstate.cookies()
+    persist: {
+        storage: import.meta.client ? piniaPluginPersistedstate.localStorage() : piniaPluginPersistedstate.cookies()
     }
 })

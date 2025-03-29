@@ -21,9 +21,9 @@
           {{ username }}<el-icon> <arrow-down/> </el-icon>
         </span>
           <template #dropdown>
-            <el-dropdown-menu style="list-style: none;margin-left:-33px;outline: unset;" >
-              <el-dropdown-item  :icon="SwitchButton"  @click="loginOut">
-                  退出登录
+            <el-dropdown-menu style="list-style: none;margin-left:-33px;outline: unset;">
+              <el-dropdown-item :icon="SwitchButton" @click="loginOut">
+                退出登录
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -37,10 +37,11 @@
 // 引入Vue和Element Plus相关组件
 import {ElDropdown, ElDropdownItem, ElDropdownMenu, ElHeader} from 'element-plus';
 import {jwtDecode} from 'jwt-decode';
-import {SwitchButton, Expand, Fold} from "@element-plus/icons-vue";
+import {Expand, Fold, SwitchButton} from "@element-plus/icons-vue";
+
 defineProps(['isCollapsed'])
 defineEmits(['toggle-collapse'])
-const loginOut=()=>{
+const loginOut = () => {
   userStore().deleteToken();
   navigateTo("/login");
 }
@@ -95,15 +96,21 @@ onMounted(() => {
 .user {
   margin-right: 20px;
 }
+
 :deep(.el-tooltip__trigger:focus-visible) {
   outline: unset;
 }
+
 .el-dropdown-link:focus {
   outline: unset;
 }
+
 .el-dropdown--menu___popper {
   outline: unset;
 }
-.el-dropdown, .el-dropdown * {outline: none;}
+
+.el-dropdown, .el-dropdown * {
+  outline: none;
+}
 
 </style>

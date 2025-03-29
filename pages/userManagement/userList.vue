@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Plus, Refresh, Search } from "@element-plus/icons-vue";
-import { ArrowDown } from '@element-plus/icons-vue'
-import { useDebounceFn } from '@vueuse/core'
+import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
+import {useDebounceFn} from '@vueuse/core'
 
 const searchField = ref('username')
 const searchValue = ref('')
@@ -19,7 +18,7 @@ const form = reactive({
 })
 const rules = reactive({
   username: [
-    { required: true, message: '用户名不能为空', trigger: 'blur' },
+    {required: true, message: '用户名不能为空', trigger: 'blur'},
   ]
 })
 
@@ -39,17 +38,17 @@ const batchOperation = (action: 'delete' | 'enable' | 'disable') => {
   const actionMap = {
     delete: {
       title: '删除',
-      api: () => http.$delete("/users/batch-delete", { ids }),
+      api: () => http.$delete("/users/batch-delete", {ids}),
       success: '删除'
     },
     enable: {
       title: '启用',
-      api: () => http.$post("/users/batch-status", { ids, status: true }),
+      api: () => http.$post("/users/batch-status", {ids, status: true}),
       success: '启用'
     },
     disable: {
       title: '禁用',
-      api: () => http.$post("/users/batch-status", { ids, status: false }),
+      api: () => http.$post("/users/batch-status", {ids, status: false}),
       success: '禁用'
     }
   }
@@ -67,7 +66,8 @@ const batchOperation = (action: 'delete' | 'enable' | 'disable') => {
     } catch {
       ElMessage.error('操作失败')
     }
-  }).catch(() => {})
+  }).catch(() => {
+  })
 }
 
 const getUserList = async () => {
@@ -146,7 +146,10 @@ onMounted(() => {
           <el-col :xs="24" :sm="6" :md="4" :lg="4">
             <el-dropdown>
               <el-button type="primary">
-                批量操作 <el-icon><arrow-down /></el-icon>
+                批量操作
+                <el-icon>
+                  <arrow-down/>
+                </el-icon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -172,13 +175,13 @@ onMounted(() => {
                     style="width: 115px"
                     @change="getUserList"
                 >
-                  <el-option label="用户名" value="username" />
-                  <el-option label="用户ID" value="id" />
-                  <el-option label="状态" value="status" />
+                  <el-option label="用户名" value="username"/>
+                  <el-option label="用户ID" value="id"/>
+                  <el-option label="状态" value="status"/>
                 </el-select>
               </template>
               <template #append>
-                <el-button :icon="Search" @click="getUserList" />
+                <el-button :icon="Search" @click="getUserList"/>
               </template>
             </el-input>
           </el-col>
@@ -201,10 +204,10 @@ onMounted(() => {
             :data="tableData"
             @selection-change="val => selectedUsers = val"
         >
-          <el-table-column type="selection" width="55" />
-          <el-table-column prop="id" label="ID" width="100" />
-          <el-table-column prop="userName" label="用户名" min-width="150" />
-          <el-table-column prop="role" label="角色" width="120" />
+          <el-table-column type="selection" width="55"/>
+          <el-table-column prop="id" label="ID" width="100"/>
+          <el-table-column prop="userName" label="用户名" min-width="150"/>
+          <el-table-column prop="role" label="角色" width="120"/>
           <el-table-column prop="status" label="状态" width="120">
             <template #default="scope">
               <el-switch
@@ -217,7 +220,7 @@ onMounted(() => {
               />
             </template>
           </el-table-column>
-          <el-table-column prop="createdAt" label="创建时间" width="180" />
+          <el-table-column prop="createdAt" label="创建时间" width="180"/>
           <el-table-column label="操作" width="150">
             <template #default="scope">
               <el-button size="small">Edit</el-button>
@@ -259,21 +262,21 @@ onMounted(() => {
     >
       <el-form :model="form" size="large" :rules="rules">
         <el-form-item label="用户名" label-width="100px" required prop="username">
-          <el-input v-model="form.username" autocomplete="off" />
+          <el-input v-model="form.username" autocomplete="off"/>
         </el-form-item>
         <el-form-item label="密码" label-width="100px">
-          <el-input v-model="form.password" autocomplete="off" />
+          <el-input v-model="form.password" autocomplete="off"/>
         </el-form-item>
         <el-form-item label="角色" label-width="100px">
           <el-select v-model="form.role" placeholder="请选择">
-            <el-option label="管理员" value="ADMIN" />
-            <el-option label="员工" value="STAFF" />
+            <el-option label="管理员" value="ADMIN"/>
+            <el-option label="员工" value="STAFF"/>
           </el-select>
         </el-form-item>
         <el-form-item label="状态" label-width="100px">
           <el-select v-model="form.status" placeholder="请选择">
-            <el-option label="启用" value="1" />
-            <el-option label="禁用" value="0" />
+            <el-option label="启用" value="1"/>
+            <el-option label="禁用" value="0"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -298,7 +301,7 @@ onMounted(() => {
 .card-container {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   padding: 20px;
 }
 
