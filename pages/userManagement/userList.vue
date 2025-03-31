@@ -1,3 +1,4 @@
+<!-- pages/userManagement/userList.vue -->
 <script setup lang="ts">
 import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
 import {useDebounceFn} from '@vueuse/core'
@@ -12,7 +13,7 @@ const centerDialogVisible = ref(false)
 const selectedUsers = ref<any[]>([])
 const form = reactive({
   username: "",
-  password: "123465",
+  password: "123456",
   role: "STAFF",
   status: '1',
 })
@@ -112,7 +113,7 @@ const newUser = async (show: boolean) => {
     ElMessage.success("添加成功")
     centerDialogVisible.value = show
     await getUserList()
-  } catch (err) {
+  } catch (err:any) {
     ElMessage.error(err.message)
   }
 }

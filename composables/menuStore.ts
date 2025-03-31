@@ -18,6 +18,7 @@ export interface SubMenuItem {
     title: string;
     path: string;
     exact?: boolean;
+    requiredRoles?: string[];
 }
 
 export interface JwtPayload {
@@ -57,7 +58,7 @@ export const menuStore = defineStore('menuStore', {
                 path: '/fileManagement',
                 title: '文件管理',
                 icon: 'Files',
-                requiredRoles: ['管理员'],
+                requiredRoles: ['管理员','员工'],
                 children: [
                     {
                         index: '2-1',
@@ -76,6 +77,53 @@ export const menuStore = defineStore('menuStore', {
                         title: '公共资源',
                         path: '/fileManagement/public',
                         exact: true
+                    }
+                ]
+            },
+            {
+                index: '3',
+                path: '/assetManagement',
+                title: '资产管理',
+                icon: 'Management',
+                requiredRoles: ['管理员','员工'],
+                children: [
+                    {
+                        index: '3-1',
+                        title: '常用物品',
+                        path: '/assetManagement/commonUse',
+                        exact: true
+                    },
+                    {
+                        index: '3-2',
+                        title: '资产入库',
+                        path: '/assetManagement/inbound',
+                        requiredRoles: ['管理员']
+                    },
+                    {
+                        index: '3-3',
+                        title: '我的申请',
+                        path: '/assetManagement/myRequests'
+                    },
+                    {
+                        index: '3-4',
+                        title: '待我审批',
+                        path: '/assetManagement/approvals',
+                        requiredRoles: ['管理员']
+                    },
+                    {
+                        index: '3-5',
+                        title: '资产列表',
+                        path: '/assetManagement/list'
+                    },
+                    {
+                        index: '3-6',
+                        title: '领用记录',
+                        path: '/assetManagement/allocations'
+                    },
+                    {
+                        index: '3-7',
+                        title: '维修报废',
+                        path: '/assetManagement/maintenance'
                     }
                 ]
             }
@@ -105,10 +153,29 @@ export const menuStore = defineStore('menuStore', {
 
         // 过滤后的菜单
         filteredMenus(state): MenuItem[] {
-            return state.allMenus.filter(menu => {
-                if (!menu.requiredRoles || menu.requiredRoles.length === 0) return true;
-                return menu.requiredRoles.some(role => this.currentRoles.includes(role));
-            });
+            return state.allMenus
+                .filter(menu => {
+                    // 主菜单权限校验（满足任意角色即可）
+                    const hasMenuAccess = !menu.requiredRoles?.length ||
+                        menu.requiredRoles.some(r => this.currentRoles.includes(r));
+
+                    // 同时需要满足：有子菜单或自身有路径
+                    const hasValidPath = !!menu.path || (menu.children?.length ?? 0) > 0;
+
+                    return hasMenuAccess && hasValidPath;
+                })
+                .map(menu => ({
+                    ...menu,
+                    children: menu.children?.filter(subMenu => {
+                        // 子菜单权限校验（逻辑同主菜单）
+                        return !subMenu.requiredRoles?.length ||
+                            subMenu.requiredRoles.some(r => this.currentRoles.includes(r));
+                    })
+                }))
+                .filter(menu =>
+                    // 最终过滤：有有效子菜单或主菜单有独立路径
+                    (menu.children?.length ?? 0) > 0 || !!menu.path
+                );
         }
     },
 });

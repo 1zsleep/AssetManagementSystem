@@ -54,11 +54,15 @@ const createHttpClient = (baseURL: string) => {
             options: UseFetchOptions<any>,
         ): Promise<any> {
             try {
+                const requestBody = options.body instanceof FormData
+                    ? options.body
+                    : JSON.stringify(options.body)
                 return await $fetch<any>(url, {
                     baseURL: baseURL,
-                    body: JSON.stringify(options.body),
+                    body: requestBody,
                     params: options.params,
                     method: unref(options.method),
+                    headers: options.headers as HeadersInit,
                     onRequest(context) {
                         interceptors.onRequest?.({options: context.options})
                     },
@@ -149,12 +153,30 @@ export const http = {
             params: params
         }),
 
-    $post: (url: string, body?: object, params?: Record<string, any>): Promise<any> =>
-        httpInstance.$request(url, {
-            body: body,
+    $post: (
+        url: string,
+        body?: any,
+        options?: {
+            params?: Record<string, any>
+            headers?: HeadersInit | Record<string, string>
+        }
+    ) => {
+        // 自动处理FormData的headers
+        const headers = {
+            ...(body instanceof FormData
+                    ? { 'Content-Type': 'multipart/form-data' }
+                    : { 'Content-Type': 'application/json' }
+            ),
+            ...options?.headers
+        }
+
+        return httpInstance.$request(url, {
             method: 'POST',
-            params: params
-        }),
+            body,
+            params: options?.params,
+            headers
+        })
+    },
 
     $put: (url: string, body?: object): Promise<any> =>
         httpInstance.$request(url, {

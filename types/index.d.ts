@@ -2,3 +2,4 @@
 export * from './user'
 export * from './group'
 export * from './http'
+export * from './asset'

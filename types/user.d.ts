@@ -20,3 +20,8 @@ export interface JwtPayload {
     sub?: string
     [key: string]: any
 }
+
+export interface Items<T> {
+    items: T[]
+    total: number
+}

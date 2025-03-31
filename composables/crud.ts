@@ -48,7 +48,7 @@ export const httpRequest = async (url: string, options: UseFetchOptions<any>): P
         onRequest({request, options}) {
             // Set the request headers
             // note that this relies on ofetch >= 1.4.0 - you may need to refresh your lockfile
-            options.headers.set('Authorization', 'Bearer ' + userStore().getToken)
+
         },
         //当请求失败（例如网络错误、超时等）时触发。
         onRequestError({request, options, error}) {

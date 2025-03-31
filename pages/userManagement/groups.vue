@@ -1,3 +1,4 @@
+<!-- pages/userManagement/groups.vue -->
 <script setup lang="ts">
 import {Close, Plus, Refresh, Search} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from 'element-plus'
@@ -51,6 +52,7 @@ const combinedUserOptions = computed(() => {
 // 工具方法------------------------------------------------
 const getCurrentUserInfo = () => {
   try {
+
     const token = userStore().token
     if (!token) throw new Error('未获取到用户信息')
     const decoded = jwtDecode<JwtPayload>(token)
@@ -80,7 +82,7 @@ const getUserName = (userId: number) => {
 const getGroupList = async () => {
   try {
     // 先获取用户信息（关键修改）
-    await getCurrentUserInfo()
+    getCurrentUserInfo()
 
     const params: Record<string, any> = {
       offset: (currentPage.value - 1) * pageSize.value,
@@ -100,9 +102,11 @@ const getGroupList = async () => {
 
     if (filter) params.filter = filter
 
-    const res = await http.$get('/groups', params) as { data: { items: UserGroup[], total: number } }
-    tableData.value = res.data.items
-    total.value = res.data.total
+    await http.$get('/groups', params).then(res => {
+      tableData.value = res.items
+      total.value = res.total
+    })
+
   } catch (error) {
     handleError(error, '获取用户组列表失败')
   }
@@ -113,24 +117,29 @@ const createGroup = async () => {
     ElMessage.warning('请填写组名称')
     return
   }
+  const creatorId = getCurrentUserInfo().id
+  const memberIds = Array.from(new Set([creatorId, ...form.userIds]))
 
-  try {
-    const creatorId = (await getCurrentUserInfo()).id
-    const groupRes = await http.$post('/groups', {
-      groupName: form.groupName,
-      creatorId
-    }) as { data: { id: number } }
+    console.log(form.groupName)
+    http.$post('/groups',{} ,{
+      params:{groupName: form.groupName,
+      creatorId}
+    }).then(res => {
+      console.log(res)
+      http.$post(`/groups/${res.data.id}/members/batch`, memberIds).then(res => {
+        console.log(res)
+      }).catch(error => {
+        console.log(error, '创建失败')
+      })
+      form.userIds = []
+      getGroupList()
+      ElMessage.success('创建成功')
+      dialogVisible.value = false
+    }).catch(error => {
+      console.log(error, '创建失败')
+    })
 
-    const memberIds = Array.from(new Set([creatorId, ...form.userIds]))
-    await http.$post(`/groups/${groupRes.data.id}/members/batch`, memberIds)
 
-    ElMessage.success('创建成功')
-    dialogVisible.value = false
-    form.userIds = []
-    await getGroupList()
-  } catch (error) {
-    handleError(error, '创建失败')
-  }
 }
 
 const deleteGroup = (groupId: number) => {
@@ -141,7 +150,7 @@ const deleteGroup = (groupId: number) => {
   }).then(async () => {
     try {
       await http.$delete(`/groups/${groupId}`, {
-        params: {operatorId: (await getCurrentUserInfo()).id}
+        params: {operatorId: getCurrentUserInfo().id}
       })
       ElMessage.success('删除成功')
       await getGroupList()
