@@ -102,6 +102,7 @@ httpInstance.addInterceptor({
         console.error('请求失败:', error)
     },
     onResponse({response}) {
+        console.log(response)
         if (response.status !== 200) {
             throw new Error(response._data?.message || '未知错误')
         }
@@ -184,7 +185,7 @@ export const http = {
             body: body,
         }),
 
-    $patch: (url: string, body?: object): Promise<any> =>
+    $patch: (url: string, body?: any): Promise<any> =>
         httpInstance.$request(url, {
             method: 'PATCH',
             body: body,

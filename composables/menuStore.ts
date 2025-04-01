@@ -2,6 +2,7 @@
 import {defineStore} from "pinia";
 import {jwtDecode} from "jwt-decode";
 import {userStore} from "./userStore";
+import type {JwtPayload} from "~/types";
 
 export interface MenuItem {
     index: string;
@@ -21,12 +22,6 @@ export interface SubMenuItem {
     requiredRoles?: string[];
 }
 
-export interface JwtPayload {
-    id: any;
-    roles?: string[];
-
-    [key: string]: any;
-}
 
 export const menuStore = defineStore('menuStore', {
     state: () => ({
@@ -95,35 +90,37 @@ export const menuStore = defineStore('menuStore', {
                     },
                     {
                         index: '3-2',
-                        title: '资产入库',
-                        path: '/assetManagement/inbound',
-                        requiredRoles: ['管理员']
+                        title: '书籍',
+                        path: '/assetManagement/Book',
                     },
                     {
                         index: '3-3',
-                        title: '我的申请',
-                        path: '/assetManagement/myRequests'
+                        title: '耗材',
+                        path: '/assetManagement/Consumable',
                     },
                     {
                         index: '3-4',
-                        title: '待我审批',
-                        path: '/assetManagement/approvals',
-                        requiredRoles: ['管理员']
+                        title: '设备',
+                        path: '/assetManagement/Equipment',
                     },
                     {
                         index: '3-5',
-                        title: '资产列表',
-                        path: '/assetManagement/list'
+                        title: userStore().currentRoles.includes('管理员')?"员工资产":"我的资产",
+                        path: '/assetManagement/UserAsset'
                     },
+                ]
+            },
+            {
+                index:'4',
+                path:'/vet',
+                title:'审批',
+                icon:'Tickets',
+                requiredRoles:['管理员'],
+                children:[
                     {
-                        index: '3-6',
-                        title: '领用记录',
-                        path: '/assetManagement/allocations'
-                    },
-                    {
-                        index: '3-7',
-                        title: '维修报废',
-                        path: '/assetManagement/maintenance'
+                        index: '4-1',
+                        title: '资产申请审批',
+                        path: '/vet/assetVet'
                     }
                 ]
             }
@@ -134,10 +131,13 @@ export const menuStore = defineStore('menuStore', {
         // 可以添加菜单更新方法
         updateMenus(newMenus: MenuItem[]) {
             this.allMenus = newMenus;
-        }
+        },
+
+
     },
 
     getters: {
+
         // 当前用户权限
         currentRoles(): string[] {
             const user = userStore();
@@ -153,6 +153,7 @@ export const menuStore = defineStore('menuStore', {
 
         // 过滤后的菜单
         filteredMenus(state): MenuItem[] {
+
             return state.allMenus
                 .filter(menu => {
                     // 主菜单权限校验（满足任意角色即可）

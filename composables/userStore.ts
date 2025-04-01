@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import {jwtDecode} from "jwt-decode";
+import type {JwtPayload} from "~/types";
 
 export const userStore = defineStore('storeId', {
     state: () => ({
@@ -37,6 +38,15 @@ export const userStore = defineStore('storeId', {
         getToken(state) {
             return state.token
         },
+        currentRoles(): string[] {
+            if (!this.token) return [];
+            try {
+                const decoded = jwtDecode<  JwtPayload>(this.token);
+                return decoded.roles || [];
+            } catch (e) {
+                return [];
+            }
+        }
     },
     persist: {
         storage: import.meta.client ? piniaPluginPersistedstate.localStorage() : piniaPluginPersistedstate.cookies()
