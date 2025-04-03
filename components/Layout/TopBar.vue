@@ -16,6 +16,7 @@
       <!-- 系统名称 -->
       <h1>资源门户 V2.0</h1>
       <div class="user">
+        <el-avatar :size="50" :src="circleUrl" />
         <el-dropdown placement="bottom">
         <span class="el-dropdown-link">
           {{ username }}<el-icon> <arrow-down/> </el-icon>
@@ -33,11 +34,12 @@
   </el-header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // 引入Vue和Element Plus相关组件
 import {ElDropdown, ElDropdownItem, ElDropdownMenu, ElHeader} from 'element-plus';
 import {jwtDecode} from 'jwt-decode';
 import {Expand, Fold, SwitchButton} from "@element-plus/icons-vue";
+import type {JwtPayload} from "~/types";
 
 defineProps(['isCollapsed'])
 defineEmits(['toggle-collapse'])
@@ -45,13 +47,18 @@ const loginOut = () => {
   userStore().deleteToken();
   navigateTo("/login");
 }
-
 const username = ref("");
+const circleUrl = ref("https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png");
 onMounted(() => {
   try {
     const token = userStore().getToken;
     if (token) {
-      username.value = jwtDecode(token).sub; // 解析 token
+      username.value = jwtDecode<JwtPayload>(token).sub; // 解析 token
+      http.$get("/users/avatar").then((res) => {
+        circleUrl.value = res;
+      });
+    } else {
+      navigateTo("/login");
     }
   } catch (error) {
     console.error("JWT 解码失败", error);
@@ -94,6 +101,9 @@ onMounted(() => {
 }
 
 .user {
+  display: flex;         /* 启用 flex 布局 */
+  align-items: center;   /* 垂直居中 */
+  gap: 12px;             /* 元素间距 */
   margin-right: 20px;
 }
 

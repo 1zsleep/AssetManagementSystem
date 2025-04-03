@@ -102,7 +102,6 @@ httpInstance.addInterceptor({
         console.error('请求失败:', error)
     },
     onResponse({response}) {
-        console.log(response)
         if (response.status !== 200) {
             throw new Error(response._data?.message || '未知错误')
         }

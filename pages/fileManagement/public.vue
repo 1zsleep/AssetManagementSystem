@@ -26,7 +26,7 @@ const currentPage = ref(1)
 const total = ref(0)
 const rawFileList = ref<AssetFile[]>([])
 const selectedFiles = ref<number[]>([])
-const visibility = ref<Visibility>('GROUP')
+const visibility = ref<Visibility>('PUBLIC')
 const groupOptions = ref<{ value: number, label: string }[]>([])
 const selectedGroup = ref<number>()
 const srcList = ref<string[]>([])
@@ -117,7 +117,6 @@ const loadFiles = async () => {
     offset: Math.max((currentPage.value - 1) * pageSize.value, 0),
     limit: Math.min(Math.max(pageSize.value, 1), 100),
     visibility: visibility.value,
-    ownerGroupId: selectedGroup.value,
     filter: searchValue.value ? `fileName like %${searchValue.value}%` : ''
   }
   await http.$get('/assets/files', params)
@@ -133,8 +132,8 @@ const loadFiles = async () => {
     const file = fileList.value[i]
     await http.$get(`/assets/files/${file.id}/preview-url`).then(
         res => {
-          srcList.value.push(res.data)
           file.thumbnailUrl = res.data
+          srcList.value.push(res.data)
         }
     )
   }
@@ -181,12 +180,15 @@ const confirmUpload = async () => {
       break
   }
 
-  await http.$post('/assets/files/upload', formData).then(res => {
+  await http.$post('/assets/files/upload', formData).then(() => {
     ElMessage.success('上传成功')
-    loadFiles()
   }).catch(error => {
+    console.log(error)
     ElMessage.error('上传失败: ' + (error as Error).message)
-  }).finally(() => tempFile.value = null)
+  }).finally(() => {
+    tempFile.value = null
+    loadFiles()
+  })
 }
 
 // 初始化
@@ -270,19 +272,6 @@ const debouncedSearch = useDebounceFn(loadFiles, 500)
           </el-col>
 
           <el-col :xs="24" :sm="6" :md="4">
-            <el-select
-                v-model="selectedGroup"
-                placeholder="选择群组"
-                :disabled="!groupOptions.length"
-                @change="loadFiles"
-            >
-              <el-option
-                  v-for="group in groupOptions"
-                  :key="group.value"
-                  :label="group.label"
-                  :value="group.value"
-              />
-            </el-select>
           </el-col>
 
           <el-col :xs="24" :sm="6" :md="10">
@@ -355,7 +344,7 @@ const debouncedSearch = useDebounceFn(loadFiles, 500)
               </template>
               <template #description>
                 <div class="empty-tips">
-                  <p style="margin-bottom: 20px;">当前群组尚未上传任何文件</p>
+                  <p style="margin-bottom: 20px;">当前尚未上传任何文件</p>
                   <el-button
                       type="primary"
                       :icon="Plus"
@@ -789,7 +778,6 @@ const debouncedSearch = useDebounceFn(loadFiles, 500)
       }
     }
   }
-
 
   .upload-dialog {
     .drag-area {

@@ -15,7 +15,7 @@ export default defineNuxtConfig({
         'dayjs-nuxt',
     ],
     build: {
-        transpile: ['@tsparticles/vue3'],
+        transpile: ['@tsparticles/vue3','vue-picture-cropper'],
     },
     devServer: {
         port: 3000,

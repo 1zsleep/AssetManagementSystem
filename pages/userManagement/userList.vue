@@ -272,6 +272,7 @@ onMounted(() => {
           <el-select v-model="form.role" placeholder="请选择">
             <el-option label="管理员" value="ADMIN"/>
             <el-option label="员工" value="STAFF"/>
+            <el-option label="采购员" value="PROCURE"/>
           </el-select>
         </el-form-item>
         <el-form-item label="状态" label-width="100px">

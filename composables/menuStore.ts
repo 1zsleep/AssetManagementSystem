@@ -28,6 +28,13 @@ export const menuStore = defineStore('menuStore', {
         role: '',
         allMenus: [
             {
+                index: '0',
+                path: '/',
+                title: '首页',
+                icon: 'HomeFilled',
+                requiredRoles: ['管理员', '员工', '采购员']
+            },
+            {
                 index: '1',
                 path: '/userManagement',
                 title: '用户管理',
@@ -53,7 +60,7 @@ export const menuStore = defineStore('menuStore', {
                 path: '/fileManagement',
                 title: '文件管理',
                 icon: 'Files',
-                requiredRoles: ['管理员','员工'],
+                requiredRoles: ['管理员', '员工', "采购员"],
                 children: [
                     {
                         index: '2-1',
@@ -80,7 +87,7 @@ export const menuStore = defineStore('menuStore', {
                 path: '/assetManagement',
                 title: '资产管理',
                 icon: 'Management',
-                requiredRoles: ['管理员','员工'],
+                requiredRoles: ['管理员', '员工', '采购员'],
                 children: [
                     {
                         index: '3-1',
@@ -105,25 +112,82 @@ export const menuStore = defineStore('menuStore', {
                     },
                     {
                         index: '3-5',
-                        title: userStore().currentRoles.includes('管理员')?"员工资产":"我的资产",
+                        title: userStore().currentRoles.includes('管理员') ? "员工资产" : "我的资产",
                         path: '/assetManagement/UserAsset'
                     },
                 ]
             },
             {
-                index:'4',
-                path:'/vet',
-                title:'审批',
-                icon:'Tickets',
-                requiredRoles:['管理员'],
-                children:[
+                index: '4',
+                path: '/vet',
+                title: '审批',
+                icon: 'Tickets',
+                requiredRoles: ['管理员'],
+                children: [
                     {
                         index: '4-1',
                         title: '资产申请审批',
                         path: '/vet/assetVet'
+                    },
+                    {
+                        index: '4-2',
+                        title: '采购表审核',
+                        path: '/vet/purchaseVet'
+                    },
+                    {
+                        index: '4-3',
+                        title: '供应商审批',
+                        path: '/vet/suppliersVet'
                     }
                 ]
-            }
+            },
+            {
+                index: '5',
+                path: '/purchase',
+                title: '单据管理',
+                icon: 'MessageBox',
+                requiredRoles: ['采购员', '管理员'],
+                children: [
+                    {
+                        index: '5-1',
+                        title: '采购单',
+                        path: '/purchase/purchaseList'
+                    }
+                ]
+            },
+            {
+                index: '6',
+                path: '/suppliers',
+                title: '供应商管理',
+                icon: 'Connection',
+                requiredRoles: ['采购员', '管理员'],
+                children: [
+                    {
+                        index: '6-1',
+                        title: '供应商列表',
+                        path: '/suppliers/suppliersList'
+                    },
+                    {
+                        index: '6-2',
+                        title: '供应商黑名单',
+                        path: '/suppliers/suppliersBlack'
+                    }
+                ]
+            },
+            {
+                index: '7',
+                path: '/setting',
+                title: '设置',
+                icon: 'Setting',
+                requiredRoles: ['管理员', '员工', '采购员'],
+                children: [
+                    {
+                        index: "7-1",
+                        title: "个人设置",
+                        path: "/setting/oneself"
+                    }
+                ]
+            },
         ] as MenuItem[]
     }),
 
