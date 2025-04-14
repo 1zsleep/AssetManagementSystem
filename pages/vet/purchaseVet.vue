@@ -6,7 +6,8 @@ import {useDebounceFn} from "@vueuse/core";
 import {jwtDecode} from "jwt-decode";
 import type {Book, JwtPayload, PurchaseOrder, Suppliers} from "~/types";
 
-
+const detailVisible = ref(false)
+const currentPurchaseOrder = ref<PurchaseOrder>()
 const searchValue = ref('')
 const pageSize = ref(10)
 const currentPage = ref(1)
@@ -108,6 +109,18 @@ const reject = (id:number) => {
     getItemList()
   }).catch(error => {
     ElMessage.error('操作失败')
+  })
+}
+//查看详情
+const re = (id: number) => {
+  const params: Record<string, any>={
+    offset:0,
+    limit:1,
+    filter: `id = %${id}%`
+  }
+  http.$get('/purchaseOrder', params).then(res => {
+    currentPurchaseOrder.value = res.items[0]
+    detailVisible.value = true
   })
 }
 // 工具方法------------------------------------------------
@@ -218,10 +231,13 @@ onMounted(() => {
           </el-table-column>
           <el-table-column  label="操作" align="center" class-name="uniform-column" width="180">
             <template #default="{ row }">
-              <el-button  type="primary" size="small" @click="approval(row.bookId)">
+              <el-button   size="small" @click="re(row.id)">
+                查看详情
+              </el-button>
+              <el-button  type="primary" size="small" @click="approval(row.id)">
                 通过
               </el-button>
-              <el-button  type="danger" size="small" @click="reject(row.bookId)">
+              <el-button  type="danger" size="small" @click="reject(row.id)">
                 驳回
               </el-button>
             </template>
@@ -242,7 +258,92 @@ onMounted(() => {
         />
       </div>
     </div>
+    <el-dialog
+        v-model="detailVisible"
+        title="采购单详情"
+        width="800px"
+    >
+      <el-row :gutter="20">
+        <!-- 左侧基础信息 -->
+        <el-col :span="12">
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="采购单ID">
+              {{ currentPurchaseOrder?.id }}
+            </el-descriptions-item>
+            <el-descriptions-item label="供应商">
+              {{ currentPurchaseOrder?.supplierName }}
+            </el-descriptions-item>
+            <el-descriptions-item label="资产类型">
+              {{ currentPurchaseOrder?.assetType }}
+            </el-descriptions-item>
+            <el-descriptions-item label="资产名称">
+              {{ currentPurchaseOrder?.assetName }}
+            </el-descriptions-item>
+            <el-descriptions-item label="单价">
+              {{ currentPurchaseOrder?.unitPrice }}
+            </el-descriptions-item>
+            <el-descriptions-item label="数量">
+              {{ currentPurchaseOrder?.quantity }}
+            </el-descriptions-item>
+            <el-descriptions-item label="总价">
+              {{ currentPurchaseOrder?.totalPrice }}
+            </el-descriptions-item>
+            <el-descriptions-item label="货币">
+              {{ currentPurchaseOrder?.currency }}
+            </el-descriptions-item>
+            <el-descriptions-item label="采购日期">
+              {{ dayjs(currentPurchaseOrder?.purchaseDate).format('YYYY-MM-DD HH:mm') }}
+            </el-descriptions-item>
+          </el-descriptions>
+        </el-col>
 
+        <!-- 右侧动态属性 -->
+        <el-col :span="12">
+          <!-- 书籍信息 -->
+          <template v-if="currentPurchaseOrder?.assetType === 'BOOK'">
+            <el-descriptions title="图书信息" :column="1" border>
+              <el-descriptions-item label="ISBN">
+                {{ currentPurchaseOrder?.assetAttributes?.isbn }}
+              </el-descriptions-item>
+              <el-descriptions-item label="作者">
+                {{ currentPurchaseOrder?.assetAttributes?.author }}
+              </el-descriptions-item>
+              <el-descriptions-item label="出版社">
+                {{ currentPurchaseOrder?.assetAttributes?.publisher }}
+              </el-descriptions-item>
+            </el-descriptions>
+          </template>
+
+          <!-- 耗材信息 -->
+          <template v-else-if="currentPurchaseOrder?.assetType === 'CONSUMABLE'">
+            <el-descriptions title="耗材信息" :column="1" border>
+              <el-descriptions-item label="单位">
+                {{ currentPurchaseOrder?.assetAttributes?.unit }}
+              </el-descriptions-item>
+              <el-descriptions-item label="分类">
+                {{ currentPurchaseOrder?.assetAttributes?.type }}
+              </el-descriptions-item>
+            </el-descriptions>
+          </template>
+
+          <!-- 设备信息 -->
+          <template v-else-if="currentPurchaseOrder?.assetType === 'EQUIPMENT'">
+            <el-descriptions title="设备信息" :column="1" border>
+              <el-descriptions-item label="序列号">
+                {{ currentPurchaseOrder?.assetAttributes?.serialNumber }}
+              </el-descriptions-item>
+              <el-descriptions-item label="设备状态">
+                {{ currentPurchaseOrder?.assetAttributes?.status }}
+              </el-descriptions-item>
+            </el-descriptions>
+          </template>
+        </el-col>
+      </el-row>
+
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 

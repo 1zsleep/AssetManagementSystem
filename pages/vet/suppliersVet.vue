@@ -32,7 +32,7 @@ const getItemList = () => {
     offset: (currentPage.value - 1) * pageSize.value,
     limit: pageSize.value,
   };
-  let filter = "status = %黑名单%";
+  let filter = "status = %待审核%";
   if (searchValue.value.trim()) {
     filter += `and name like %${searchValue.value}%`;
   }
@@ -216,61 +216,63 @@ onMounted(() => {
           <el-input v-else v-model="formData.id" disabled/>
         </el-form-item>
 
-        <el-form-item label="全称" prop="name">
+        <el-form-item label="全称:" prop="name">
           <span>{{ formData.name }}</span>
         </el-form-item>
-
-        <el-form-item label="状态">
+        <el-form-item label="简称:" prop="name">
+          <span>{{ formData.shortName }}</span>
+        </el-form-item>
+        <el-form-item label="状态:">
           <span>{{ formData.status }}</span>
         </el-form-item>
 
-        <el-form-item label="类型">
+        <el-form-item label="类型:">
           <span>{{ formData.type }}</span>
         </el-form-item>
 
         <!-- 联系信息 -->
-        <el-form-item label="主要联系人">
+        <el-form-item label="主要联系人:">
           <span>{{ formData.primaryContact }}</span>
         </el-form-item>
 
-        <el-form-item label="联系电话">
+        <el-form-item label="联系电话:">
           <span>{{ formData.phone }}</span>
         </el-form-item>
 
-        <el-form-item label="电子邮箱">
+        <el-form-item label="电子邮箱:">
           <span>{{ formData.email }}</span>
         </el-form-item>
 
         <!-- 地址信息 -->
-        <el-form-item label="地区编码">
+        <el-form-item label="地区编码:">
           <span>{{ formData.regionCode }}</span>
         </el-form-item>
 
-        <el-form-item label="详细地址">
+        <el-form-item label="详细地址:">
           <span>{{ formData.address }}</span>
         </el-form-item>
 
         <!-- 财务信息 -->
-        <el-form-item label="税号">
+        <el-form-item label="税号:">
           <span>{{ formData.taxNumber }}</span>
         </el-form-item>
 
-        <el-form-item label="开户银行">
+        <el-form-item label="开户银行:">
           <span>{{ formData.bankName }}</span>
         </el-form-item>
 
-        <el-form-item label="银行账号" prop="bankAccount">
+        <el-form-item label="银行账号:" prop="bankAccount">
           <span>{{ formData.bankAccount }}</span>
         </el-form-item>
 
         <!-- 合作信息 -->
-        <el-form-item label="发票类型">
+        <el-form-item label="发票类型:">
         <span>
           {{ formData.invoiceType === 0 ? '普通发票' : '增值税专用发票' }}
         </span>
         </el-form-item>
 
-        <el-form-item label="合作期限">
+        <el-form-item label="合作期限:">
           <div class="date-range">
             <span>{{ dayjs(formData.startDate).format('YYYY-MM-DD') }}</span>
             <span style="margin: 0 5px">至</span>
@@ -279,7 +281,7 @@ onMounted(() => {
         </el-form-item>
 
         <!-- 系统信息 -->
-        <el-form-item label="评分">
+        <el-form-item label="评分:">
           <el-rate v-model="formData.score" disabled show-score/>
         </el-form-item>
 

@@ -62,6 +62,7 @@ interface PurchaseOrder {
     assetType: string
     assetName: string
     purchaseDate: string
+    supplierName: string
     quantity: number
     unitPrice: number
     totalPrice: number
@@ -69,6 +70,7 @@ interface PurchaseOrder {
     supplier: string
     currency: string
     archiveDate: string
+    assetAttributes: Record<string, any>
 }
 
 interface Suppliers {
@@ -89,7 +91,7 @@ interface Suppliers {
     startDate: string
     endDate: string
     score: number
-    createdBy: string
+    createdBy: number
     updatedBy: string
     createdAt: string
     updatedAt: string

@@ -39,19 +39,21 @@ export const menuStore = defineStore('menuStore', {
                 path: '/userManagement',
                 title: '用户管理',
                 icon: 'User',
-                requiredRoles: ['管理员'],
+                requiredRoles: ['管理员', '员工', '采购员'],
                 children: [
                     {
                         index: '1-1',
                         title: '用户列表',
                         path: '/userManagement/userList',
-                        exact: true
+                        exact: true,
+                        requiredRoles: ['管理员']
                     },
                     {
                         index: '1-2',
                         title: '用户组',
                         path: '/userManagement/groups',
-                        exact: true
+                        exact: true,
+                        requiredRoles: ['管理员', '员工', '采购员']
                     }
                 ]
             },
@@ -91,7 +93,7 @@ export const menuStore = defineStore('menuStore', {
                 children: [
                     {
                         index: '3-1',
-                        title: '常用物品',
+                        title: '福利物品',
                         path: '/assetManagement/commonUse',
                         exact: true
                     },

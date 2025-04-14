@@ -202,6 +202,7 @@ const handleDownload = async (file: AssetFile) => {
     const link = document.createElement('a')
     link.href = res.data
     link.download = file.fileName
+    console.log(link)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)

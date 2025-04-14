@@ -90,6 +90,7 @@ const getCurrentUserInfo = () => {
 };
 //新增供应商
 const addSuppliers = () => {
+  addForm.value.createdBy = currentUser.id;
   http.$post("/suppliers", addForm.value).then((res) => {
     ElMessage.success("添加成功");
     getItemList();

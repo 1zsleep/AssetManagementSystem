@@ -9,6 +9,7 @@ import type {Item} from "~/types/item";
 
 const dialogVisible = ref(false)
 const editDialogVisible = ref(false)
+const formRef = ref()
 const searchValue = ref('')
 const pageSize = ref(10)
 const currentPage = ref(1)
@@ -30,12 +31,25 @@ const selectedItemId = ref<number | null>(null)
 const applyForm = reactive({
   quantity: 0
 })
-
+const formRules = reactive({
+  name: [{ required: true, message: '请输入物品名称', trigger: 'blur' }],
+  unit: [{ required: true, message: '请输入计量单位', trigger: 'blur' }],
+  annualLimit: [{ required: true, message: '请输入年度领取上限', trigger: 'blur' }],
+  currentStock: [{ required: true, message: '请输入物品数量', trigger: 'blur' }]
+})
 const createItem = () => {
-  http.$post('/item', form).then(res => {
-    ElMessage.success('添加成功')
-    dialogVisible.value = false
-    getItemList()
+  formRef.value?.validate((valid:any ) => {
+    if (valid) {
+      http.$post('/item', form).then(res => {
+        ElMessage.success('添加成功')
+        dialogVisible.value = false
+        getItemList()
+      }).catch(error => {
+        ElMessage.error('添加失败')
+      })
+    } else {
+      ElMessage.error('请填写必填字段')
+    }
   })
 }
 
@@ -114,7 +128,7 @@ onMounted(() => {
       <div class="toolbar">
         <el-row :gutter="20">
           <el-col :xs="24" :sm="6" :md="4">
-            <el-button type="primary" :icon="Plus" @click="dialogVisible = true">
+            <el-button v-if="currentUser.isAdmin" type="primary" :icon="Plus" @click="dialogVisible = true">
               添加物品
             </el-button>
           </el-col>
@@ -216,9 +230,9 @@ onMounted(() => {
       </div>
     </div>
 
-    <el-dialog v-if="currentUser.isAdmin" v-model="dialogVisible" title="导入物品" width="600px" center>
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="物品名称" required>
+    <el-dialog v-if="currentUser.isAdmin" v-model=" dialogVisible" title="导入物品" width="600px" center>
+      <el-form :model="form" label-width="80px" :rules="formRules" ref="formRef">
+        <el-form-item label="物品名称"  prop="name"  required>
           <el-input
               v-model="form.name"
               placeholder="请输入物品名称"
@@ -234,7 +248,7 @@ onMounted(() => {
               show-word-limit
           />
         </el-form-item>
-        <el-form-item label="计量单位" required>
+        <el-form-item label="计量单位" prop="unit" required>
           <el-input
               v-model="form.unit"
               placeholder="请输入计量单位"
@@ -242,7 +256,7 @@ onMounted(() => {
               show-word-limit
           />
         </el-form-item>
-        <el-form-item label="领取上限" required>
+        <el-form-item label="领取上限" prop="annualLimit" required>
           <el-input
               v-model="form.annualLimit"
               placeholder="请输入计量单位"
@@ -250,7 +264,7 @@ onMounted(() => {
               show-word-limit
           />
         </el-form-item>
-        <el-form-item label="物品数量" required>
+        <el-form-item label="物品数量" prop="currentStock" required>
           <el-input
               v-model="form.currentStock"
               placeholder="请输入物品数量"

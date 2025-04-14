@@ -3,13 +3,14 @@
 import {ArrowDown, Plus, Refresh, Search} from "@element-plus/icons-vue";
 import {useDebounceFn} from '@vueuse/core'
 
-const searchField = ref('username')
+const searchField = ref('userName')
 const searchValue = ref('')
 const pageSize = ref(10)
 const currentPage = ref(1)
 const total = ref(0)
 const tableData = ref([])
 const centerDialogVisible = ref(false)
+const editDialogVisible = ref(false)
 const selectedUsers = ref<any[]>([])
 const form = reactive({
   username: "",
@@ -22,7 +23,13 @@ const rules = reactive({
     {required: true, message: '用户名不能为空', trigger: 'blur'},
   ]
 })
-
+const editForm = reactive({
+  id: 0,
+  userName: "",
+  userPassword: "",
+  role: "STAFF",
+  status: true,
+})
 // 批量操作统一处理
 const batchOperation = (action: 'delete' | 'enable' | 'disable') => {
   if (selectedUsers.value.length === 0) {
@@ -75,10 +82,22 @@ const getUserList = async () => {
   try {
     const offset = (currentPage.value - 1) * pageSize.value
     const limit = pageSize.value
-    const filter = searchValue.value.trim()
-        ? `${searchField.value} like %${searchValue.value.trim()}%`
-        : ''
-
+    let filter = ''
+    if (searchValue.value.trim()){
+      switch (searchField.value){
+        case 'userName':
+          filter = `userName like %${searchValue.value.trim()}%`
+          break
+        case 'id':
+          filter = `id = %${searchValue.value.trim()}%`
+          break
+        case 'status':
+          filter = `status = ${searchValue.value.trim()}`
+          break
+        default:
+          break
+      }
+    }
     const response = await http.$get("/users/list", {
       offset,
       limit,
@@ -92,11 +111,25 @@ const getUserList = async () => {
 }
 
 const updateUser = (row: any) => {
+  console.log(row)
   http.$patch("/users", row).then(() => {
     getUserList()
   })
+  editDialogVisible.value = false
 }
-
+const handleEdit = (row:any) => {
+  if (row.id === 1) {
+    ElMessage.warning('管理员账户不可编辑')
+    return
+  }
+  console.log("edit: ", row)
+  editForm.id = row.id
+  editForm.userName = row.userName
+  editForm.role = row.role
+  editForm.status = row.status
+  editForm.userPassword = ''
+  editDialogVisible.value = true
+}
 const newUser = async (show: boolean) => {
   if (form.username === '') {
     ElMessage.warning("用户名不能为空")
@@ -169,6 +202,7 @@ onMounted(() => {
                 clearable
                 @input="debouncedSearch"
                 @clear="getUserList"
+                :disabled="searchField === 'status'"
             >
               <template #prepend>
                 <el-select
@@ -176,13 +210,24 @@ onMounted(() => {
                     style="width: 115px"
                     @change="getUserList"
                 >
-                  <el-option label="用户名" value="username"/>
+                  <el-option label="用户名" value="userName"/>
                   <el-option label="用户ID" value="id"/>
                   <el-option label="状态" value="status"/>
                 </el-select>
               </template>
               <template #append>
-                <el-button :icon="Search" @click="getUserList"/>
+                <el-select
+                    v-if="searchField === 'status'"
+                    v-model="searchValue"
+                    placeholder="请选择状态"
+                    style="width: 120px;background-color: white"
+                    @change="getUserList"
+                >
+                  <el-option label="全部" value=""/>
+                  <el-option label="启用" value='true'/>
+                  <el-option label="禁用" value='false'/>
+                </el-select>
+                <el-button v-else :icon="Search" @click="getUserList"/>
               </template>
             </el-input>
           </el-col>
@@ -224,7 +269,7 @@ onMounted(() => {
           <el-table-column prop="createdAt" label="创建时间" width="180"/>
           <el-table-column label="操作" width="150">
             <template #default="scope">
-              <el-button size="small">Edit</el-button>
+              <el-button size="small" @click="handleEdit(scope.row)">Edit</el-button>
               <el-button
                   size="small"
                   type="danger"
@@ -287,6 +332,47 @@ onMounted(() => {
           <el-button @click="centerDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="newUser(false)">提交</el-button>
           <el-button type="success" @click="newUser(true)">保存并继续添加</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 添加编辑对话框 -->
+    <el-dialog
+        v-model="editDialogVisible"
+        title="编辑用户"
+        width="500"
+        center
+        draggable
+    >
+      <el-form :model="editForm" size="large" :rules="rules">
+        <el-form-item label="用户名" label-width="100px" required prop="username">
+          <el-input v-model="editForm.userName" />
+        </el-form-item>
+        <el-form-item label="新密码" label-width="100px">
+          <el-input
+              v-model="editForm.userPassword"
+              type="password"
+              placeholder="留空则不修改密码"
+          />
+        </el-form-item>
+        <el-form-item label="角色" label-width="100px">
+          <el-select v-model="editForm.role">
+            <el-option label="管理员" value="ADMIN" :disabled="editForm.id === 1"/>
+            <el-option label="员工" value="STAFF"/>
+            <el-option label="采购员" value="PROCURE"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态" label-width="100px">
+          <el-select v-model="editForm.status">
+            <el-option label="启用" :value="true"/>
+            <el-option label="禁用" :value="false"/>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="updateUser(editForm)">保存</el-button>
         </div>
       </template>
     </el-dialog>
