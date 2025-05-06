@@ -35,6 +35,7 @@
       <!-- 用户信息表单 -->
       <el-form
           :model="form"
+          ref="formRef"
           :rules="rules"
           label-width="100px"
           @submit.prevent="handleSubmit"
@@ -100,7 +101,7 @@
 import {onMounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import VuePictureCropper, { cropper } from 'vue-picture-cropper'
-
+const formRef = ref<InstanceType<typeof ElForm>>()
 // 用户信息表单
 const form = ref({
   userName: '',
@@ -129,7 +130,7 @@ const beforeAvatarUpload = (file: File) => {
   return false // 阻止自动上传
 }
 const confirmCrop = async () => {
-  cropper?.getFile().then(file => {
+  cropper?.getFile().then((file:any) => {
     const formData = new FormData()
     formData.append('file', file)
     http.$post('/users/avatar', formData).then(res => {
@@ -166,7 +167,7 @@ const rules = ref({
     {min: 6, max: 20, message: '密码长度需在6-20个字符之间', trigger: 'blur'}
   ],
   confirmPassword: [
-    {validator: validatePassword, trigger: 'blur'}
+    {validator: validatePassword, trigger:  ['blur', 'change']}
   ]
 })
 
@@ -176,6 +177,8 @@ const rules = ref({
 // 提交表单
 const handleSubmit = async () => {
   try {
+    await formRef.value?.validate()
+
     const payload = {
       userName: "",
       userPassword: ""
